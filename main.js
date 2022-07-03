@@ -5,14 +5,16 @@ canvas.width = window.innerWidth - 100;
 canvas.height = window.innerHeight - 100;
 
 let SIZE = 50;
+let LEFT = 50;
 let BOTTOM = Math.ceil(canvas.height*(3/4));
+
 /*
 var dinoImg = new Image();
 dinoImg.src = 'dino.png';
 */
 // 공룡
 var dino = {
-    x : 10,
+    x : LEFT,
     y : BOTTOM,
     width : SIZE,
     height : SIZE,
@@ -48,7 +50,7 @@ function play(){
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    if (timer % 150 === 0) {
+    if (timer % 200 === 0) {
         var cactus = new Cactus();
         cactuss.push(cactus);
     }
@@ -80,19 +82,21 @@ function play(){
     dino.draw();
 }
 
-play();
-
-
 // 충돌 확인
 function collisionCheck(dino, cactus) {
-    var xD = cactus.x - (dino.x + dino.width) + (cactus.x < 0 ? cactus.width : 0);
+    var xD;
+    if (cactus.x < LEFT) {
+        xD = dino.x - (cactus.x + cactus.width);
+    } else {
+        xD = cactus.x - (dino.x + dino.width);
+    }
     var yD = cactus.y - (dino.y + dino.height);
     if (xD < 0 && yD < 0) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        cancelAnimationFrame(animation);
+        //ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //cancelAnimationFrame(animation);
+        stop();
     }
 }
-
 
 // 점프
 var isJumping = false;
@@ -103,18 +107,28 @@ document.addEventListener('keydown', function(e){
     }
 });
 
-// 재시작 버튼 클릭 시
+// 재시작
 var restartBtn = document.getElementById("restartBtn");
 restartBtn.addEventListener("click", function() {
+    this.disabled = true;
     this.blur();
-    cancelAnimationFrame(animation);
     initData();
     play();
 });
 
+// 데이터 초기화
 function initData() {
     isJumping = false;
     jumpTimer = 0;
     dino.y = BOTTOM;
     cactuss = [];
 }
+
+// 게임 중지
+function stop() {
+    restartBtn.disabled = false;
+    cancelAnimationFrame(animation);
+}
+
+
+play();
